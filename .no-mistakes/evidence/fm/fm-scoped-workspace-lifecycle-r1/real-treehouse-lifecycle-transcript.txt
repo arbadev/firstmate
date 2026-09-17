@@ -1,0 +1,113 @@
+
+### 1. Two homes sharing one project resolve distinct, non-global Treehouse roots
+home-a root: <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb
+home-b root: <tmp>/task-workspaces/home-a3fd965fe8ea90e7156aa9096fd9855858fce29d
+distinct: yes
+
+### 2. Allocate a stacked pair in home-a (PR 7 -> main, PR 8 -> fm/lower) and one task in home-b (PR 9)
+lower: <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project
+upper: <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/2/project
+btask: <tmp>/task-workspaces/home-a3fd965fe8ea90e7156aa9096fd9855858fce29d/.treehouse/project-c049a6/1/project
+$ treehouse --root <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb status
+1     leased       <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project  (held by firstmate:04e887b89493:lower)
+2     leased       <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/2/project  (held by firstmate:04e887b89493:upper)
+[exit 0]
+$ treehouse --root <tmp>/task-workspaces/home-a3fd965fe8ea90e7156aa9096fd9855858fce29d status
+1     leased       <tmp>/task-workspaces/home-a3fd965fe8ea90e7156aa9096fd9855858fce29d/.treehouse/project-c049a6/1/project  (held by firstmate:a3fd965fe8ea:btask)
+[exit 0]
+
+### 3. Refusals preserve non-reconstructable work (home-a upper task)
+$ <fm>/bin/fm-workspace.sh release upper
+REFUSED: workspace <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/2/project has dirty or untracked files; commit or preserve them before cleanup
+[exit 1]
+$ <fm>/bin/fm-workspace.sh release upper
+REFUSED: workspace <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/2/project contains ignored secret-like material; preserve or remove it explicitly before cleanup
+[exit 1]
+$ <fm>/bin/fm-workspace.sh release upper
+REFUSED: local HEAD 4e7a7b0273ece78a8527c8374dd6966d71662874 is not contained in remote PR head 3f2cb73e4acc4c311beb24f0b81ffc91bb56a956; cleanup would lose unique commits
+[exit 1]
+after refusals the workspace still exists: yes state=active
+
+### 4. Clean, fully pushed stacked PR releases; real Treehouse returns and destroys the slot
+$ <fm>/bin/fm-workspace.sh release upper
+🌳 Worktree returned to pool.
+🌳 Destroyed 1 worktree in <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/2/project and freed 314 B.
+  2     [disposable]  314 B  <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/2/project
+workspace upper released; remote head 3f2cb73e4acc4c311beb24f0b81ffc91bb56a956 branch fm/upper base fm/lower
+[exit 0]
+$ <fm>/bin/fm-workspace.sh release lower
+🌳 Worktree returned to pool.
+🌳 Destroyed 1 worktree in <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project and freed 313 B.
+  1     [disposable]  313 B  <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project
+workspace lower released; remote head 20fa04cc85c0c794f9fb05418623221bc4610f19 branch fm/lower base main
+[exit 0]
+idempotent retry:
+$ <fm>/bin/fm-workspace.sh release upper
+workspace upper already released
+[exit 0]
+$ treehouse --root <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb status
+🌳 No worktrees in pool.
+[exit 0]
+upper worktree dir exists: no; lower: no
+--- home-a/state/upper.meta (durable reconstruction record) ---
+project=<tmp>/project
+harness=codex
+kind=ship
+mode=no-mistakes
+yolo=off
+spawn_gen=demo
+worktree=
+workspace_state=released
+workspace_head=3f2cb73e4acc4c311beb24f0b81ffc91bb56a956
+workspace_branch=fm/upper
+workspace_base=fm/lower
+workspace_root=<tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb
+workspace_lease_holder=firstmate:04e887b89493:upper
+workspace_released_at=2026-09-17T12:12:05Z
+endpoint_task_id=upper
+window=firstmate:fm-upper
+pr=https://github.com/example/repo/pull/8
+pr_head=3f2cb73e4acc4c311beb24f0b81ffc91bb56a956
+
+### 5. home-b's workspace in the same project was never touched by home-a's cleanup
+$ treehouse --root <tmp>/task-workspaces/home-a3fd965fe8ea90e7156aa9096fd9855858fce29d status
+1     leased       <tmp>/task-workspaces/home-a3fd965fe8ea90e7156aa9096fd9855858fce29d/.treehouse/project-c049a6/1/project  (held by firstmate:a3fd965fe8ea:btask)
+[exit 0]
+btask worktree intact: fm/btask
+
+### 6. Restore reconstructs the exact stacked branch and head from the remote
+$ <fm>/bin/fm-workspace.sh restore upper
+🌳 Setting up worktree...
+🌳 Leased worktree at <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project. Run 'treehouse return <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project' to release it.
+workspace upper restored at <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project from 3f2cb73e4acc4c311beb24f0b81ffc91bb56a956 (fm/upper -> fm/lower)
+[exit 0]
+branch=fm/upper head=3f2cb73e4acc4c311beb24f0b81ffc91bb56a956 expected=3f2cb73e4acc4c311beb24f0b81ffc91bb56a956
+state=restored base=fm/lower
+unique layer vs its stacked base:
+3f2cb73 work for upper
+restored-but-never-relaunched workspace releases again:
+$ <fm>/bin/fm-workspace.sh release upper
+🌳 Worktree returned to pool.
+🌳 Destroyed 1 worktree in <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project and freed 313 B.
+  1     [disposable]  313 B  <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb/.treehouse/project-c049a6/1/project
+workspace upper released; remote head 3f2cb73e4acc4c311beb24f0b81ffc91bb56a956 branch fm/upper base fm/lower
+[exit 0]
+$ treehouse --root <tmp>/task-workspaces/home-04e887b8949365a5d79ba41343a69757ec389ddb status
+🌳 No worktrees in pool.
+[exit 0]
+
+### 7. Legacy pool audit (dry-run) and conservative reclaim against a legacy-style root
+$ <fm>/bin/fm-workspace.sh audit-legacy <tmp>/legacy-home
+🌳 Dry run: would prune 1 stale worktree across 1 pool and reclaim 313 B.
+1     313 B  <tmp>/legacy-home/.treehouse/project-c049a6/1/project
+🌳 Re-run with --all --yes to delete these worktrees.
+[exit 0]
+after audit both legacy slots still exist: L1 L2
+$ <fm>/bin/fm-workspace.sh reclaim-legacy <tmp>/legacy-home
+🌳 Pruned 1 stale worktree across 1 pool and freed 313 B.
+1     313 B  <tmp>/legacy-home/.treehouse/project-c049a6/1/project
+[exit 0]
+after reclaim: idle clean slot L1 exists=no; leased slot L2 with unique work exists=yes unique.txt=unique unpushed work
+
+### 8. The user-global ~/.treehouse pool listing is byte-identical before and after
+before=d0d796c19c9574a768e24de1f27a22001b7019f4 after=d0d796c19c9574a768e24de1f27a22001b7019f4 unchanged=yes
