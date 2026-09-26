@@ -1,0 +1,13 @@
+$ claude --version
+2.1.280 (Claude Code)
+
+$ claude -p --agent-teams </dev/null
+error: unknown option '--agent-teams'
+exit=1
+
+$ CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude -p --teammate-mode in-process </dev/null   # option parsing accepted; stops only for missing prompt
+Error: Input must be provided either through stdin or as a prompt argument when using --print
+exit=1
+
+$ jq .env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS ~/.claude/settings.json   # global setting untouched
+null
