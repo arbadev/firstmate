@@ -1,0 +1,55 @@
+Effort cue and cycle on Claude Code 2.1.289, firstmate-calm mod at 96f6d1c, 2026-10-05.
+Every launch ran a byte-identical task-local copy of the installed package with DISABLE_AUTOUPDATER=1
+(PATH, npm_config_prefix and npm_config_cache pointed at the copy), so the shared install could not be updated.
+
+== 1. ctrl+tab bound to command:effort-cycle (throwaway CLAUDE_CONFIG_DIR, saved level high, no login) ==
+keybindings.json: {"bindings":[{"context":"Chat","bindings":{"ctrl+tab":"command:effort-cycle"}}]}
+press 1 -> header says xhigh; lab settings: {"effortLevel":"high","skipDangerousModePermissionPrompt":true,"modelSettings":{"claude-sonnet-5-5":{"effortLevel":"xhigh"}}}
+press 2 -> header says max; lab settings: {"effortLevel":"high","skipDangerousModePermissionPrompt":true,"modelSettings":{"claude-sonnet-5-5":{"effortLevel":"xhigh"}}}
+press 3 -> header says low; lab settings: {"effortLevel":"high","modelSettings":{"claude-sonnet-5-5":{"effortLevel":"low"}},"skipDangerousModePermissionPrompt":true}
+press 4 -> header says medium; lab settings: {"effortLevel":"high","modelSettings":{"claude-sonnet-5-5":{"effortLevel":"medium"}},"skipDangerousModePermissionPrompt":true}
+press 5 -> header says high; lab settings: {"effortLevel":"high","modelSettings":{"claude-sonnet-5-5":{"effortLevel":"high"}},"skipDangerousModePermissionPrompt":true}
+keybindings loaded: 1
+mod loaded: 2026-10-05T22:37:45.052Z [DEBUG] hooks module fm@skills-dir loaded (worker, environment 1, tier user); events: session.start,command.run,config.set,turn.step,ui.render,ui.press
+skipped/threw lines naming the mod: 0
+
+== 2. One short turn per level, logged-in sessions on claude-sonnet-5 started with --effort (nothing saved) ==
+(color256 is the xterm-256 code the cue's rule is painted in; footer is the user's own status line badge)
+--effort low, no request     cue="◌ effort ?" color256=244 footer=think:low
+--effort low, after turn     cue="○ low" color256=246 footer=think:low
+--effort medium, no request  cue="◌ effort ?" color256=244 footer=think:med
+--effort medium, after turn  cue="◔ medium" color256=153 footer=think:med
+--effort high, no request    cue="◌ effort ?" color256=244 footer=think:high
+--effort high, after turn    cue="◑ high" color256=174 footer=think:high
+--effort xhigh, no request   cue="◌ effort ?" color256=244 footer=think:xhigh
+--effort xhigh, after turn   cue="◕ xhigh" color256=220 footer=think:xhigh
+confirmation shown: ❯ 1. Yes, switch to max
+/effort-cycle from xhigh     cue="◌ effort ?" color256=244 footer=think:max
+after the next turn          cue="● max" color256=208 footer=think:max
+skipped/threw lines naming the mod (low): 0
+skipped/threw lines naming the mod (medium): 0
+skipped/threw lines naming the mod (high): 0
+skipped/threw lines naming the mod (xhigh): 0
+
+== 3. Opt-in live guard: FM_CLAUDE_CALM_LIVE_E2E=1 tests/fm-calm-claude-mod-live-e2e.test.sh ==
+# live guard start 2026-10-05T22:35:06Z
+claude=<lab>/prefix/bin/claude version=2.1.289 (Claude Code)
+settings.json sha before: cad6fa0347e40893997a3e1d58a18ee94ecc1b3a5c48d47a8d1e2f85c10e630c
+keybindings.json sha before: 4b01db1eeb5484d059a88daa8dc38ff9c8af2a346a948f0f4c40671d4f185af3
+ok - Claude Code 2.1.289 (Claude Code) with the flag unset (the engine loaded the hooks module through its own rollout flag and the mod stayed inert): no /calm, no effort cue, stock working row, stock tool rows, preference on ignored
+ok - Claude Code 2.1.289 (Claude Code) with the flag on: the mod auto-loads from .claude/skills, /calm exists, the sailboat replaces and moves in the working row, tool rows and the record-backed operational doorbell draw at zero height, /calm restores and re-hides them while persisting the shared preference
+ok - Claude Code 2.1.289 (Claude Code) resumes the transcript with Calm's hidden rows still hidden and the preference intact
+ok - Claude Code 2.1.289 (Claude Code) with Calm off shows the supervision notes: the session-start anchor for an unprocessed captain outcome, a sailboat for a new routine outcome, an anchor for a new captain outcome, and the latch-trip note, each behind the fm: label, skipping processed and silent outcomes, moving no store marker, never reaching the model, and on resume showing each anchor once
+ok - Claude Code 2.1.289 (Claude Code) effort cue, in a throwaway configuration with no login: the cue draws above the prompt and names no level before a request, ctrl+tab bound to command:effort-cycle steps the real level from the saved high to xhigh, max, and around to low, /effort-cycle steps it to medium, the band's own focus-and-press keys step from the captain's own /effort max around to low, the cue claims no level after any of them, and no hook of the mod is skipped; with the login on claude-sonnet-5, started with --effort so nothing is saved: a request proves low and xhigh and the cue names each in a color of its own, the step after a reply asks for max, which the cue names in a third color only once a request has carried it, and offers max again after its change was turned down at Claude Code's confirmation; NOT RUN on this engine: the cue under /effort auto after a proven level, because that command would rewrite the captain's saved level; the captain's settings.json (sha256 cad6fa0347e40893997a3e1d58a18ee94ecc1b3a5c48d47a8d1e2f85c10e630c) and keybindings.json (sha256 4b01db1eeb5484d059a88daa8dc38ff9c8af2a346a948f0f4c40671d4f185af3) are unchanged
+GUARD_EXIT=0
+# live guard end 2026-10-05T22:37:29Z
+settings.json sha after: cad6fa0347e40893997a3e1d58a18ee94ecc1b3a5c48d47a8d1e2f85c10e630c
+keybindings.json sha after: 4b01db1eeb5484d059a88daa8dc38ff9c8af2a346a948f0f4c40671d4f185af3
+shared claude --version after: 2.1.289 (Claude Code)
+
+== 4. Nothing of the user's changed ==
+~/.claude/settings.json sha256 after all runs:    cad6fa0347e40893997a3e1d58a18ee94ecc1b3a5c48d47a8d1e2f85c10e630c
+~/.claude/keybindings.json sha256 after all runs: 4b01db1eeb5484d059a88daa8dc38ff9c8af2a346a948f0f4c40671d4f185af3
+shared Claude Code package tree digest before:    394f56632bd4e2a9b91ad3c4b62379848678a2f8783d312186887976a4418ab8
+shared Claude Code package tree digest after:     394f56632bd4e2a9b91ad3c4b62379848678a2f8783d312186887976a4418ab8
+shared claude --version after:                    2.1.289 (Claude Code)

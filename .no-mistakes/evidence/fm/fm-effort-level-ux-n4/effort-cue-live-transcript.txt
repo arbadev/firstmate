@@ -1,0 +1,29 @@
+Live Claude Code 2.1.280 TUI under tmux, firstmate-calm loaded from a lab project's .claude/skills
+symlink with CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1, model sonnet (Sonnet 5), dark theme, 256-color.
+Sessions started with `claude --effort <level>` so no saved setting of the user's was written.
+
+level   before any request      after one turn       rule color (xterm-256 / theme key)
+low     ◌ effort ?  (244)       ○ low     think:low     246 / inactive
+medium  ◌ effort ?  (244)       ◔ medium  think:med     153 / permission
+high    ◌ effort ?  (244)       ◑ high    think:high    174 / claude
+xhigh   ◌ effort ?  (244)       ◕ xhigh   think:xhigh   warning
+max     ◌ effort ?  (244)       ● max     think:max     fastMode
+
+/effort-cycle from xhigh:
+  after turn            think:xhigh | ◕ xhigh
+  /effort-cycle         "Change effort level?  ❯ 1. Yes, switch to max  2. No, go back"  -> Yes
+  after step            think:max   | ◌ effort ?   ("Set effort level to max (this session only)")
+  after next turn       think:max   | ● max
+
+band key path (ctrl+x tab, enter) from xhigh:
+  after press           think:max   | ◌ effort ?
+  after next turn       think:max   | ● max
+  debug log: 0 "hook skipped|threw" lines naming the mod
+
+ctrl+tab bound to command:effort-cycle (throwaway CLAUDE_CONFIG_DIR, saved level high, no login):
+  press 1  /effort xhigh  (saved as your default for new sessions -- lab settings only)
+  press 2  /effort max    (this session only)
+  press 3  /effort low    (wraps; footer ○ low · /effort)
+
+~/.claude/settings.json sha256 before and after all runs:
+  e3aa5f298855604cdea9c1ed1d4f52d964cfd05fd2dd44d36ad189e00d99aa71 (unchanged)

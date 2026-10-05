@@ -1,0 +1,81 @@
+<!doctype html><meta charset="utf-8"><title>Effort cue: one theme color per level, named only once a request carries it</title>
+<style>body{background:#101114;color:#ddd;font-family:-apple-system,Helvetica,sans-serif;margin:24px;width:1080px}
+h1{font-size:20px;margin:0 0 6px}p.sub{margin:0 0 18px;color:#9aa;font-size:13px}
+figure{margin:0 0 18px;border:1px solid #333;border-radius:8px;overflow:hidden}
+figcaption{background:#22252b;padding:6px 12px;font-size:13px;color:#cfd3da}
+pre{margin:0;padding:10px 12px;background:#1b1d22;color:#d8d8d8;font:12.5px/1.35 Menlo,monospace;white-space:pre;overflow:hidden}</style>
+<h1>Effort cue: one theme color per level, named only once a request carries it</h1><p class="sub">Real Claude Code 2.1.280 TUI under tmux (dark theme, 256-color), firstmate-calm mod loaded with CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1. Captured with tmux capture-pane -e and rendered as-is.</p>
+<figure><figcaption>Before any request (session started with --effort low): the cue draws ◌ effort ? in the prompt border color</figcaption><pre><span style="opacity:.6">▎</span> <span style="color:rgb(148,148,148)">Debug mode enabled · logging to /tmp/fm-effort-lab.YLyEzy/debug-low.log</span>
+
+◌ effort ?<span style="color:rgb(128,128,128)"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────</span> <span style="color:rgb(148,148,148)">[-]</span>
+                                                                                                       <span style="color:rgb(148,148,148)">○ low · /effort</span>
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+❯ 
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+  <span style="color:rgb(175,135,255);font-weight:bold">Sonnet 5</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(128,128,128)">think:low</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(135,175,215)">fm-effort-lab.YLyEzy/project</span>
+  <span style="color:rgb(255,135,175)">⏵⏵ bypass permissions on</span><span style="color:rgb(148,148,148)"> (shift+tab to cycle) · ← for agents</span></pre></figure>
+<figure><figcaption>After one turn at low: ○ low, rule painted in theme key inactive</figcaption><pre><span style="color:rgb(78,78,78);background:rgb(58,58,58)">❯ </span><span style="color:rgb(255,255,255);background:rgb(58,58,58)">Reply with the word ahoy in uppercase and nothing else.</span>
+
+<span style="color:rgb(255,255,255)">⏺</span> AHOY
+
+<span style="color:rgb(148,148,148)">✻</span> <span style="color:rgb(148,148,148)">Crunched for 2s · done 2:15 AM</span>
+
+○ low<span style="color:rgb(148,148,148)"> ──────────────────────────────────────────────────────────────────────────────────────────────────────────────</span> <span style="color:rgb(148,148,148)">[-]</span>
+                                                                                                       <span style="color:rgb(148,148,148)">○ low · /effort</span>
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+❯ 
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+  <span style="color:rgb(175,135,255);font-weight:bold">Sonnet 5</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(128,128,128)">think:low</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(135,175,215)">fm-effort-lab.YLyEzy/project</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(215,175,135)">ctx 5%</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">5h:31%</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">7d:22%</span>
+  <span style="color:rgb(255,135,175)">⏵⏵ bypass permissions on</span><span style="color:rgb(148,148,148)"> (shift+tab to cycle) · ← for agents</span></pre></figure>
+<figure><figcaption>After one turn at medium: ◔ medium, rule painted in theme key permission</figcaption><pre><span style="color:rgb(78,78,78);background:rgb(58,58,58)">❯ </span><span style="color:rgb(255,255,255);background:rgb(58,58,58)">Reply with the word ahoy in uppercase and nothing else.</span>
+
+<span style="color:rgb(255,255,255)">⏺</span> AHOY
+
+<span style="color:rgb(148,148,148)">✻</span> <span style="color:rgb(148,148,148)">Worked for 3s · done 2:15 AM</span>
+
+◔ medium<span style="color:rgb(175,215,255)"> ───────────────────────────────────────────────────────────────────────────────────────────────────────────</span> <span style="color:rgb(148,148,148)">[-]</span>
+                                                                                                    <span style="color:rgb(148,148,148)">◐ medium · /effort</span>
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+❯ 
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+  <span style="color:rgb(175,135,255);font-weight:bold">Sonnet 5</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(135,175,215)">think:med</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(135,175,215)">fm-effort-lab.YLyEzy/project</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(215,175,135)">ctx 5%</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">5h:31%</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">7d:22%</span>
+  <span style="color:rgb(255,135,175)">⏵⏵ bypass permissions on</span><span style="color:rgb(148,148,148)"> (shift+tab to cycle) · ← for agents</span></pre></figure>
+<figure><figcaption>After one turn at high: ◑ high, rule painted in theme key claude</figcaption><pre><span style="color:rgb(78,78,78);background:rgb(58,58,58)">❯ </span><span style="color:rgb(255,255,255);background:rgb(58,58,58)">Reply with the word ahoy in uppercase and nothing else.</span>
+
+<span style="color:rgb(255,255,255)">⏺</span> AHOY
+
+<span style="color:rgb(148,148,148)">✻</span> <span style="color:rgb(148,148,148)">Cooked for 2s · done 2:15 AM</span>
+
+◑ high<span style="color:rgb(215,135,135)"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────</span> <span style="color:rgb(148,148,148)">[-]</span>
+                                                                                                      <span style="color:rgb(148,148,148)">● high · /effort</span>
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+❯ 
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+  <span style="color:rgb(175,135,255);font-weight:bold">Sonnet 5</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(215,175,95)">think:high</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(135,175,215)">fm-effort-lab.YLyEzy/project</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(215,175,135)">ctx 5%</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">5h:31%</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">7d:22%</span>
+  <span style="color:rgb(255,135,175)">⏵⏵ bypass permissions on</span><span style="color:rgb(148,148,148)"> (shift+tab to cycle) · ← for agents</span></pre></figure>
+<figure><figcaption>After one turn at xhigh: ◕ xhigh, rule painted in theme key warning</figcaption><pre><span style="color:rgb(78,78,78);background:rgb(58,58,58)">❯ </span><span style="color:rgb(255,255,255);background:rgb(58,58,58)">Reply with the word ahoy in uppercase and nothing else.</span>
+
+<span style="color:rgb(255,255,255)">⏺</span> AHOY
+
+<span style="color:rgb(148,148,148)">✻</span> <span style="color:rgb(148,148,148)">Sautéed for 1s · done 2:16 AM</span>
+
+◕ xhigh<span style="color:rgb(255,215,0)"> ────────────────────────────────────────────────────────────────────────────────────────────────────────────</span> <span style="color:rgb(148,148,148)">[-]</span>
+                                                                                                     <span style="color:rgb(148,148,148)">◉ xhigh · /effort</span>
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+❯ 
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+  <span style="color:rgb(175,135,255);font-weight:bold">Sonnet 5</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(215,135,95)">think:xhigh</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(135,175,215)">fm-effort-lab.YLyEzy/project</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(215,175,135)">ctx 5%</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">5h:31%</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">7d:22%</span>
+  <span style="color:rgb(255,135,175)">⏵⏵ bypass permissions on</span><span style="color:rgb(148,148,148)"> (shift+tab to cycle) · ← for agents</span></pre></figure>
+<figure><figcaption>After one turn at max: ● max, rule painted in theme key fastMode</figcaption><pre><span style="color:rgb(78,78,78);background:rgb(58,58,58)">❯ </span><span style="color:rgb(255,255,255);background:rgb(58,58,58)">Reply with the word avast in uppercase and nothing else.</span>
+
+<span style="color:rgb(255,255,255)">⏺</span> AVAST
+
+<span style="color:rgb(148,148,148)">✻</span> <span style="color:rgb(148,148,148)">Crunched for 1s · done 2:16 AM</span>
+
+● max<span style="color:rgb(255,135,0)"> ──────────────────────────────────────────────────────────────────────────────────────────────────────────────</span> <span style="color:rgb(148,148,148)">[-]</span>
+                     <span style="color:rgb(148,148,148)">tmux detected · scroll with PgUp/PgDn · or add 'set -g mouse on' to ~/.tmux.conf for wheel scroll</span>
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+❯ 
+<span style="color:rgb(128,128,128)">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+  <span style="color:rgb(175,135,255);font-weight:bold">Sonnet 5</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(215,135,135)">think:max</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(135,175,215)">fm-effort-lab.YLyEzy/project</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(215,175,135)">ctx 5%</span><span style="color:rgb(148,148,148)"> </span><span style="color:#e5e5e5;opacity:.6">|</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">5h:31%</span><span style="color:rgb(148,148,148)"> </span><span style="color:rgb(148,148,148);opacity:.6">7d:22%</span>
+  <span style="color:rgb(255,135,175)">⏵⏵ bypass permissions on</span><span style="color:rgb(148,148,148)"> (shift+tab to cycle) · ← for agents</span></pre></figure>
