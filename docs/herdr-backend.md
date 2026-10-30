@@ -287,10 +287,13 @@ Projected children are placed in one contiguous block immediately after their ow
 - `python3`.
 - The account-private per-session lock.
 
-With an exact parent id, unrelated non-projection workspaces delimit other blocks regardless of their labels; they are never adopted or moved. Without that identity, only the known home labels anchor blocks.
+Every projected spawn passes its owning parent's exact id.
+With that id, any labeled workspace that is not a projection child starts its own block regardless of its label, so a new-format child after it counts as that workspace's block; such workspaces are never adopted or moved.
+Only a caller that passes no exact id gets the conservative label-only fallback, where the known home labels alone anchor blocks.
 This is adjacency in Herdr's workspace list, not native nested workspaces.
 Existing legacy child labels may extend an already adjacent block read-only but are never renamed or migrated.
-A foreign, ambiguous, detached, or manually interleaved child makes ordering skip with a warning rather than rewriting the layout.
+With the exact id, ordering skips with a warning rather than rewriting the layout when a legacy child follows a workspace other than its own home, a child follows an unlabeled workspace, or the exact parent or new workspace is missing or out of place.
+In the label-only fallback, a duplicated home label or a child after any non-home workspace also makes ordering skip.
 
 Ordering failure never fails the task spawn.
 Firstmate does not retry, adopt, reuse, close, delete, or rename anything in response to an unavailable method, lock contention, ambiguous socket, lost response, failed move, or verification mismatch.

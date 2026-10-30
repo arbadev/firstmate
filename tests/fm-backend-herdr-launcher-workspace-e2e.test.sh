@@ -475,6 +475,39 @@ lab pane get "$UNIQB_PANE" >/dev/null 2>&1 || fail "teardown closed an unrelated
 [ "$(label_of_workspace "$WS_PRIMARY_DUP")" = firstmate ] || fail "teardown removed or renamed the launcher's workspace"
 pass "real herdr E2E: teardown closes only the worker's own pane and leaves the launcher, its workspace, and the same-labeled sibling intact"
 
+# --- 9. a restart reclaims a named parent's child; a renamed parent refuses --
+
+NAMED_A1_JOURNAL="$PRES_HOME/state/namedA1.herdr-presentation"
+NAMED_A1_WS=$(journal_field "$NAMED_A1_JOURNAL" workspace_id)
+NAMED_A1_OLD_PANE=$(journal_field "$NAMED_A1_JOURNAL" pane_id)
+NAMED_B1_WS=$(journal_field "$PRES_HOME/state/namedB1.herdr-presentation" workspace_id)
+NAMED_B1_LABEL=$(label_of_workspace "$NAMED_B1_WS")
+lab workspace rename "$WS_NAMED_B" project-b-renamed >/dev/null 2>&1 \
+  || fail "could not rename the project-b parent workspace"
+"$HERDR_LAB_HELPER" stop "$HERDR_LAB_SESSION" >/dev/null || fail "could not stop the isolated session for restart reclaim"
+"$HERDR_LAB_HELPER" provision "$HERDR_LAB_SESSION" || fail "could not reprovision the isolated session for restart reclaim"
+RESTART_FOCUS=$(focused_workspace)
+
+spawn_from_launcher "$LAUNCH_NAMED_A" "$PRES_HOME" namedA1 "$PROJ" --mode no-mistakes --yolo off
+[ "$SPAWN_RC" -eq 0 ] || fail "a restarted child under a named parent failed to relaunch"$'\n'"$(cat "$SPAWN_ERR")"
+record_worktree "$PRES_HOME/state/namedA1.meta"
+NAMED_A1_NEW_PANE=$(grep '^herdr_pane_id=' "$PRES_HOME/state/namedA1.meta" | cut -d= -f2-)
+[ "$(workspace_of_pane "$NAMED_A1_NEW_PANE")" = "$NAMED_A1_WS" ] && [ "$NAMED_A1_NEW_PANE" != "$NAMED_A1_OLD_PANE" ] \
+  || fail "a named parent's restarted child must be reclaimed in its own workspace, not spawned flat"$'\n'"$(cat "$SPAWN_ERR")"
+[ "$(journal_field "$NAMED_A1_JOURNAL" pane_id)" = "$NAMED_A1_NEW_PANE" ] \
+  && [ "$(journal_field "$NAMED_A1_JOURNAL" parent_label)" = project-a ] \
+  || fail "restart reclaim did not advance the named parent's exact binding"
+[ "$(focused_workspace)" = "$RESTART_FOCUS" ] || fail "restart reclaim changed the selected workspace"
+
+spawn_from_launcher "$LAUNCH_NAMED_B" "$PRES_HOME" namedB1 "$PROJ" --mode no-mistakes --yolo off
+[ "$SPAWN_RC" -eq 0 ] || fail "a renamed parent must fall back flat, not fail the relaunch"$'\n'"$(cat "$SPAWN_ERR")"
+record_worktree "$PRES_HOME/state/namedB1.meta"
+assert_contains_local "$(cat "$SPAWN_ERR")" "spawning flat" "a renamed parent must refuse restart reclaim"
+[ "$(workspace_of_pane "$(grep '^herdr_pane_id=' "$PRES_HOME/state/namedB1.meta" | cut -d= -f2-)")" != "$NAMED_B1_WS" ] \
+  || fail "a renamed parent's child was reclaimed anyway"
+[ "$(label_of_workspace "$NAMED_B1_WS")" = "$NAMED_B1_LABEL" ] || fail "a refused reclaim renamed or removed the old projection"
+pass "real herdr E2E: after a restart a named parent's child is reclaimed in place, while a renamed parent refuses reclaim and spawns flat"
+
 if ! cleanup_all; then
   trap - EXIT
   printf 'not ok - isolated Herdr lab teardown failed or the default fleet session changed\n' >&2
