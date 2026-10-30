@@ -279,7 +279,7 @@ An ambiguous response grants no mutation or cleanup authority.
 Protocol 16 exposes `workspace.move` over the named session socket but no CLI subcommand.
 `bin/backends/herdr-workspace-move.py` sends only that whitelisted method and verifies the complete returned workspace order.
 
-Projected children are placed in one contiguous block immediately after their owning home when all of these are verifiable:
+Projected children are placed in one contiguous block immediately after their owning parent when all of these are verifiable:
 
 - The session layout.
 - The protocol.
