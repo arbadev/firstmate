@@ -264,6 +264,7 @@ Neither token, title, nor journal authorizes send, capture, task ownership, Tree
 ### Owning parent and tabs
 
 The owning parent is the launcher's own exact workspace, resolved from the same identity the flat path uses.
+Its current label is recorded with that id, so a custom parent label does not prevent an exact restart binding; a changed label still refuses reclaim.
 It falls back to a unique home-label lookup only for a Firstmate outside Herdr.
 Projected children are never collapsed back into that parent.
 The parent is the placement and ordering reference the projection is bound under.
@@ -286,6 +287,8 @@ Projected children are placed in one contiguous block immediately after their ow
 - `python3`.
 - The account-private per-session lock.
 
+With an exact parent id, unrelated non-projection workspaces delimit other blocks regardless of their labels; they are never adopted or moved. Without that identity, only the known home labels anchor blocks.
+This is adjacency in Herdr's workspace list, not native nested workspaces.
 Existing legacy child labels may extend an already adjacent block read-only but are never renamed or migrated.
 A foreign, ambiguous, detached, or manually interleaved child makes ordering skip with a warning rather than rewriting the layout.
 

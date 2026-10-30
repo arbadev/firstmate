@@ -1470,9 +1470,10 @@ fm_backend_herdr_pane_idle_shell_sample() {  # <session> <pane-id>
 # Optional <parent-workspace-id> is that parent's EXACT id, which the caller
 # already resolved from the launching agent's own herdr identity. When given it
 # anchors the owning parent by id, so two workspaces sharing the home label no
-# longer make the whole layout ambiguous; when omitted the parent is located by
-# label exactly as before. With a unique label the two select the same
-# workspace, so ordering behavior is unchanged in the ordinary case.
+# longer make the whole layout ambiguous. With an exact parent id, unrelated
+# non-projection workspaces delimit other blocks regardless of their labels;
+# none are adopted or moved. Without it, only the known home labels anchor
+# blocks, preserving the conservative label-only fallback.
 # New-format └ ... · p:<token> children and, for compatibility only, already
 # adjacent old-format firstmate/... or 2ndmate-<id>/... projections may extend
 # the block read-only; they are never renamed or moved.
@@ -1511,15 +1512,16 @@ fm_backend_herdr_projection_order_best_effort() {  # <session> <created-workspac
       then .workspace_id == $parent_ws
       else (.label | type) == "string" and .label == $parent
       end;
-    def is_top_level_parent:
-      (.label | type) == "string"
-      and ((.label == "firstmate") or (.label | test("^2ndmate-[^/]+$")));
     def is_new_child:
       (.label | type) == "string"
       and (.label | test("^└ .+ · p:[A-Za-z0-9_-]{22}$"));
     def is_legacy_child:
       (.label | type) == "string"
       and (.label | test("^(firstmate|2ndmate-[^/]+)/.+ · p:[A-Za-z0-9_-]{22}$"));
+    def is_top_level_parent:
+      (.label | type) == "string"
+      and ((.label == "firstmate") or (.label | test("^2ndmate-[^/]+$"))
+        or (($parent_ws | length) > 0 and (is_new_child | not) and (is_legacy_child | not)));
     def is_legacy_child_for($owner):
       is_legacy_child and (.label | startswith($owner + "/"));
     def is_child_for($owner):
@@ -1835,6 +1837,7 @@ fm_backend_herdr_launcher_identity() {  # <session>
   FM_BACKEND_HERDR_LAUNCHER_PANE_ID=""
   FM_BACKEND_HERDR_LAUNCHER_TAB_ID=""
   FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_ID=""
+  FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_LABEL=""
   [ -n "$pane" ] || return 2
 
   # Same-session proof, before the pane id is trusted at all: herdr pane ids
@@ -1916,6 +1919,12 @@ fm_backend_herdr_launcher_identity() {  # <session>
   # shellcheck disable=SC2034  # callers consume the verified binding's parts
   FM_BACKEND_HERDR_LAUNCHER_TAB_ID=$tab
   FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_ID=$workspace
+  # Labels describe the already-proven id; they never select its owner.
+  # shellcheck disable=SC2034  # projected spawn records this exact parent label
+  FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_LABEL=$(printf '%s' "$list" | jq -r --arg workspace "$workspace" '
+    .result.workspaces[] | select(.workspace_id == $workspace)
+    | .label | select(type == "string")
+  ' 2>/dev/null)
   return 0
 }
 

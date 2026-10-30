@@ -198,7 +198,7 @@ Verify the worker is placed in the correct workspace.
 EOF
 }
 
-for id in uniqA uniqB dupC dupD staleF smE presU presD; do
+for id in uniqA uniqB dupC dupD staleF smE presU presD namedA1 namedB1 namedA2 namedB2; do
   mkdir -p "$PRIMARY_HOME/data/$id" "$SM_HOME/data/$id" "$PRES_HOME/data/$id"
   write_ship_brief "$PRIMARY_HOME/data/$id/brief.md" "$id"
   write_ship_brief "$SM_HOME/data/$id/brief.md" "$id"
@@ -355,6 +355,38 @@ PRESD_ORDER=$(lab workspace list 2>/dev/null | jq -r --arg dup "$WS_PRIMARY_DUP"
   || fail "the other same-labeled workspace was mutated by a projected spawn"
 [ "$(focused_workspace)" = "$WS_OTHER" ] || fail "a projected spawn stole focus from the captain's workspace"
 pass "real herdr E2E: with a duplicated home label, a projected worker still hangs off the launcher's exact workspace and the sibling stays untouched"
+
+# --- 3c. arbitrary parent labels and interleaved launches keep each block ---
+
+read -r WS_NAMED_A _ LAUNCH_NAMED_A <<EOF
+$(make_workspace project-a)
+EOF
+read -r WS_NAMED_B _ LAUNCH_NAMED_B <<EOF
+$(make_workspace project-b)
+EOF
+for id in namedA1 namedB1 namedA2 namedB2; do
+  case "$id" in
+    namedA*) parent=$WS_NAMED_A; launcher=$LAUNCH_NAMED_A; parent_label=project-a ;;
+    namedB*) parent=$WS_NAMED_B; launcher=$LAUNCH_NAMED_B; parent_label=project-b ;;
+  esac
+  spawn_from_launcher "$launcher" "$PRES_HOME" "$id" "$PROJ" --mode no-mistakes --yolo off
+  [ "$SPAWN_RC" -eq 0 ] || fail "a projected spawn under $parent_label failed"$'\n'"$(cat "$SPAWN_ERR")"
+  meta="$PRES_HOME/state/$id.meta"
+  record_worktree "$meta"
+  journal="$PRES_HOME/state/$id.herdr-presentation"
+  [ "$(journal_field "$journal" version)" = 2 ] \
+    && [ "$(journal_field "$journal" parent_workspace_id)" = "$parent" ] \
+    && [ "$(journal_field "$journal" parent_label)" = "$parent_label" ] \
+    || fail "a named parent must publish its exact id and actual label in the restart binding"
+  child=$(workspace_of_pane "$(grep '^herdr_pane_id=' "$meta" | cut -d= -f2-)")
+  case "$id" in *1) expected=1 ;; *2) expected=2 ;; esac
+  lab workspace list 2>/dev/null | jq -e --arg parent "$parent" --arg child "$child" --argjson expected "$expected" '
+    .result.workspaces | map(.workspace_id)
+    | (index($child) - index($parent)) == $expected
+  ' >/dev/null || fail "a projected child must follow its own named parent's existing block"
+  [ "$(focused_workspace)" = "$WS_OTHER" ] || fail "a named-parent spawn changed the unrelated selected workspace"
+done
+pass "real herdr E2E: named parents retain their own contiguous children and exact bindings across interleaved launches without changing focus"
 
 # --- 4. duplicate label with NO launcher identity refuses before publishing --
 
