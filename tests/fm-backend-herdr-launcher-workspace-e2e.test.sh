@@ -47,7 +47,7 @@ command -v treehouse >/dev/null 2>&1 || { echo "skip: treehouse not found (requi
 herdr_forget_inherited_pane
 
 TMP_ROOT=$(mktemp -d "$(cd "${TMPDIR:-/tmp}" && pwd -P)/fm-herdr-launcher-e2e.XXXXXX")
-HERDR_LAB_HELPER="$ROOT/bin/fm-herdr-lab.sh"
+HERDR_LAB_HELPER=${HERDR_LAB_HELPER:-$ROOT/bin/fm-herdr-lab.sh}
 HERDR_LAB_SESSION=$("$HERDR_LAB_HELPER" name fm-herdr-launcher-ws) || {
   rm -rf "$TMP_ROOT"
   printf 'not ok - could not generate an isolated Herdr lab session name\n' >&2
@@ -78,6 +78,31 @@ trap cleanup_all EXIT
 "$HERDR_LAB_HELPER" provision "$HERDR_LAB_SESSION" || fail "could not provision isolated Herdr lab session"
 
 lab() { "$HERDR_LAB_HELPER" run "$HERDR_LAB_SESSION" "$@"; }
+
+# Production spawn and teardown reach Herdr through this PATH shim, which drops
+# only the adapter's own trailing lab-session flag, refuses any other session,
+# and sends every call through the lab helper's guarded run.
+FAKEBIN="$TMP_ROOT/fakebin"
+mkdir -p "$FAKEBIN"
+{
+  printf '#!/usr/bin/env bash\nset -u\n'
+  printf 'LAB_SESSION=%q LAB_HELPER=%q ORIGINAL_PATH=%q\n' "$HERDR_LAB_SESSION" "$HERDR_LAB_HELPER" "$PATH"
+  cat <<'SH'
+args=("$@")
+last=$((${#args[@]} - 1))
+if [ "$last" -ge 1 ] && [ "${args[$((last - 1))]}" = --session ] && [ "${args[$last]}" = "$LAB_SESSION" ]; then
+  unset "args[$last]" "args[$((last - 1))]"
+fi
+set -- ${args[@]+"${args[@]}"}
+for arg in "$@"; do
+  case "$arg" in
+    --session|--session=*) echo "lab herdr shim: refusing a call addressed outside $LAB_SESSION" >&2; exit 1 ;;
+  esac
+done
+exec env PATH="$ORIGINAL_PATH" "$LAB_HELPER" run "$LAB_SESSION" "$@"
+SH
+} > "$FAKEBIN/herdr"
+chmod +x "$FAKEBIN/herdr"
 
 # --- helpers ----------------------------------------------------------------
 
@@ -129,13 +154,13 @@ spawn_from_launcher() {
   shift 4
   SPAWN_OUT="$TMP_ROOT/$id.out"; SPAWN_ERR="$TMP_ROOT/$id.err"
   if [ -n "$pane" ]; then
-    env HERDR_ENV=1 HERDR_PANE_ID="$pane" HERDR_SESSION="$HERDR_LAB_SESSION" \
+    env PATH="$FAKEBIN:$PATH" HERDR_ENV=1 HERDR_PANE_ID="$pane" HERDR_SESSION="$HERDR_LAB_SESSION" \
       HERDR_SOCKET_PATH="$LAB_SOCKET" \
       FM_SPAWN_NO_GUARD=1 FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
       "$ROOT/bin/fm-spawn.sh" "$id" "$proj" "sh -c 'echo launcher-ws-ok'" --backend herdr "$@" \
       >"$SPAWN_OUT" 2>"$SPAWN_ERR"
   else
-    env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH HERDR_SESSION="$HERDR_LAB_SESSION" \
+    env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH PATH="$FAKEBIN:$PATH" HERDR_SESSION="$HERDR_LAB_SESSION" \
       FM_SPAWN_NO_GUARD=1 FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
       "$ROOT/bin/fm-spawn.sh" "$id" "$proj" "sh -c 'echo launcher-ws-ok'" --backend herdr "$@" \
       >"$SPAWN_OUT" 2>"$SPAWN_ERR"
@@ -295,7 +320,7 @@ WS_PRIMARY_TABS_BEFORE=$(tab_labels_of_workspace "$WS_PRIMARY")
 cat > "$TMP_ROOT/spawn-in-pane.sh" <<SPAWN
 #!/usr/bin/env bash
 set -u
-FM_SPAWN_NO_GUARD=1 FM_HOME="$PRIMARY_HOME" FM_ROOT_OVERRIDE="$ROOT" \\
+PATH="$FAKEBIN:\$PATH" FM_SPAWN_NO_GUARD=1 FM_HOME="$PRIMARY_HOME" FM_ROOT_OVERRIDE="$ROOT" \\
   "$ROOT/bin/fm-spawn.sh" dupC "$PROJ" "sh -c 'echo launcher-ws-ok'" --mode no-mistakes --yolo off --backend herdr \\
   > "$TMP_ROOT/dupC.out" 2> "$TMP_ROOT/dupC.err"
 echo \$? > "$TMP_ROOT/dupC.rc"
@@ -461,8 +486,8 @@ pass "real herdr E2E: a --secondmate launch still stands up that secondmate's ow
 
 # --- 8. teardown closes only the worker's own pane --------------------------
 
-FM_ROOT_OVERRIDE="$ROOT" FM_STATE_OVERRIDE="$PRIMARY_HOME/state" FM_DATA_OVERRIDE="$PRIMARY_HOME/data" \
-  FM_CONFIG_OVERRIDE="$PRIMARY_HOME/config" \
+PATH="$FAKEBIN:$PATH" FM_HOME="$PRIMARY_HOME" FM_ROOT_OVERRIDE="$ROOT" FM_STATE_OVERRIDE="$PRIMARY_HOME/state" \
+  FM_DATA_OVERRIDE="$PRIMARY_HOME/data" FM_CONFIG_OVERRIDE="$PRIMARY_HOME/config" \
   "$ROOT/bin/fm-teardown.sh" dupC >"$TMP_ROOT/teardown.out" 2>&1
 status=$?
 [ "$status" -eq 0 ] || fail "fm-teardown.sh failed for dupC"$'\n'"$(cat "$TMP_ROOT/teardown.out")"

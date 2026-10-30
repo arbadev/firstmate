@@ -291,7 +291,8 @@ Every projected spawn passes its owning parent's exact id.
 With that id, any labeled workspace that is not a projection child starts its own block regardless of its label, so a new-format child after it counts as that workspace's block; such workspaces are never adopted or moved.
 Only a caller that passes no exact id gets the conservative label-only fallback, where the known home labels alone anchor blocks.
 This is adjacency in Herdr's workspace list, not native nested workspaces.
-Existing legacy child labels may extend an already adjacent block read-only but are never renamed or migrated.
+Existing legacy child labels may extend an already adjacent block read-only, but only under a parent whose live label equals their `firstmate` or `2ndmate-<id>` owner prefix; they are never renamed or migrated.
+Under a parent with any other live label, an adjacent live legacy child makes ordering skip, and the new task gets no exact restart binding.
 With the exact id, ordering skips with a warning rather than rewriting the layout when a legacy child follows a workspace other than its own home, a child follows an unlabeled workspace, or the exact parent or new workspace is missing or out of place.
 In the label-only fallback, a duplicated home label or a child after any non-home workspace also makes ordering skip.
 

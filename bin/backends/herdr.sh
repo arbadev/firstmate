@@ -1466,7 +1466,9 @@ fm_backend_herdr_pane_idle_shell_sample() {  # <session> <pane-id>
 # returned by THIS projected create immediately after its owning parent's
 # contiguous child block and before the next parent.
 #
-# <parent-label> is the owning FM_HOME label (firstmate or 2ndmate-<id>).
+# <parent-label> is the owning parent workspace's live label: the launcher
+# workspace's own label inside Herdr, or the FM_HOME label (firstmate or
+# 2ndmate-<id>) for a Firstmate outside Herdr.
 # Optional <parent-workspace-id> is that parent's EXACT id, which the caller
 # already resolved from the launching agent's own herdr identity. When given it
 # anchors the owning parent by id, so two workspaces sharing the home label no
@@ -1475,8 +1477,9 @@ fm_backend_herdr_pane_idle_shell_sample() {  # <session> <pane-id>
 # none are adopted or moved. Without it, only the known home labels anchor
 # blocks, preserving the conservative label-only fallback.
 # New-format └ ... · p:<token> children and, for compatibility only, already
-# adjacent old-format firstmate/... or 2ndmate-<id>/... projections may extend
-# the block read-only; they are never renamed or moved.
+# adjacent old-format firstmate/... or 2ndmate-<id>/... projections whose owner
+# prefix equals <parent-label> may extend the block read-only; they are never
+# renamed or moved.
 #
 # Optional <group-order-key> is the opt-in project-group key that
 # bin/fm-herdr-groups.sh order-key prints for the new task. When given, the
