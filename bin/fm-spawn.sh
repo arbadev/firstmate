@@ -4799,6 +4799,10 @@ else
           if [ -z "$HERDR_PARENT_WORKSPACE_ID" ] || [ -z "$HERDR_PARENT_LABEL" ]; then
             echo "warning: herdr presentation parent is absent or ambiguous; using the ordinary flat layout without projection" >&2
             spawn_herdr_presentation_order_lock_release
+          elif [[ $HERDR_PARENT_LABEL == *$'\n'* ]]; then
+            # The restart journal stores one field per line.
+            echo "warning: herdr presentation parent label contains a line break and cannot be recorded in the restart journal; using the ordinary flat layout without projection" >&2
+            spawn_herdr_presentation_order_lock_release
           else
             HERDR_PROJECTION_ID=$(fm_backend_herdr_projection_journal_create "$STATE" "$ID") || exit 1
             HERDR_PROJECTION_LABEL=$(fm_backend_herdr_projection_workspace_label "$ID" "$HERDR_PROJECTION_ID")

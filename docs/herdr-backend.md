@@ -265,6 +265,7 @@ Neither token, title, nor journal authorizes send, capture, task ownership, Tree
 
 The owning parent is the launcher's own exact workspace, resolved from the same identity the flat path uses.
 Its current label is recorded with that id, so a custom parent label does not prevent an exact restart binding; a changed label still refuses reclaim.
+A label containing a line break cannot be recorded in that one-field-per-line journal, so such a spawn warns and uses the flat layout before any projection or journal exists.
 It falls back to a unique home-label lookup only for a Firstmate outside Herdr.
 Projected children are never collapsed back into that parent.
 The parent is the placement and ordering reference the projection is bound under.

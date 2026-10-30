@@ -223,7 +223,7 @@ Verify the worker is placed in the correct workspace.
 EOF
 }
 
-for id in uniqA uniqB dupC dupD staleF smE presU presD namedA1 namedB1 namedA2 namedB2; do
+for id in uniqA uniqB dupC dupD staleF smE presU presD namedA1 namedB1 namedA2 namedB2 namedNL; do
   mkdir -p "$PRIMARY_HOME/data/$id" "$SM_HOME/data/$id" "$PRES_HOME/data/$id"
   write_ship_brief "$PRIMARY_HOME/data/$id/brief.md" "$id"
   write_ship_brief "$SM_HOME/data/$id/brief.md" "$id"
@@ -412,6 +412,27 @@ for id in namedA1 namedB1 namedA2 namedB2; do
   [ "$(focused_workspace)" = "$WS_OTHER" ] || fail "a named-parent spawn changed the unrelated selected workspace"
 done
 pass "real herdr E2E: named parents retain their own contiguous children and exact bindings across interleaved launches without changing focus"
+
+# --- 3d. a parent label with a line break cannot fit the restart journal ----
+
+read -r WS_NAMED_NL _ LAUNCH_NAMED_NL <<EOF
+$(make_workspace $'project-c\nline-two')
+EOF
+[ -n "$WS_NAMED_NL" ] || fail "could not create the line-break-labeled parent workspace"
+[ "$(lab workspace list 2>/dev/null | jq -r --arg id "$WS_NAMED_NL" '.result.workspaces[]? | select(.workspace_id == $id) | .label | test("\n")')" = true ] \
+  || fail "Herdr did not keep the line break in the parent label this case depends on"
+NL_SPACES_BEFORE=$(lab workspace list 2>/dev/null | jq -r '.result.workspaces | length')
+spawn_from_launcher "$LAUNCH_NAMED_NL" "$PRES_HOME" namedNL "$PROJ" --mode no-mistakes --yolo off
+[ "$SPAWN_RC" -eq 0 ] || fail "a line-break parent label must fall back flat, not fail the spawn"$'\n'"$(cat "$SPAWN_ERR")"
+record_worktree "$PRES_HOME/state/namedNL.meta"
+assert_contains_local "$(cat "$SPAWN_ERR")" "contains a line break" "a line-break parent label must warn why it spawned flat"
+[ ! -e "$PRES_HOME/state/namedNL.herdr-presentation" ] || fail "a line-break parent label left a presentation journal"$'\n'"$(cat "$PRES_HOME/state/namedNL.herdr-presentation")"
+[ "$(lab workspace list 2>/dev/null | jq -r '.result.workspaces | length')" = "$NL_SPACES_BEFORE" ] \
+  || fail "a line-break parent label still allocated a projection workspace"
+[ "$(workspace_of_pane "$(grep '^herdr_pane_id=' "$PRES_HOME/state/namedNL.meta" | cut -d= -f2-)")" = "$WS_NAMED_NL" ] \
+  || fail "the flat fallback did not place the worker in its launcher's exact workspace"
+[ "$(focused_workspace)" = "$WS_OTHER" ] || fail "a line-break parent spawn changed the unrelated selected workspace"
+pass "real herdr E2E: a parent label with a line break spawns flat in its exact workspace with no journal or projection"
 
 # --- 4. duplicate label with NO launcher identity refuses before publishing --
 
