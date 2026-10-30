@@ -1923,11 +1923,14 @@ fm_backend_herdr_launcher_identity() {  # <session>
   FM_BACKEND_HERDR_LAUNCHER_TAB_ID=$tab
   FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_ID=$workspace
   # Labels describe the already-proven id; they never select its owner.
+  # The "." sentinel keeps trailing line breaks that command substitution
+  # would strip, so the spawn's journal check sees the raw label.
   # shellcheck disable=SC2034  # projected spawn records this exact parent label
   FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_LABEL=$(printf '%s' "$list" | jq -r --arg workspace "$workspace" '
     .result.workspaces[] | select(.workspace_id == $workspace)
-    | .label | select(type == "string")
+    | .label | select(type == "string") | . + "."
   ' 2>/dev/null)
+  FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_LABEL=${FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_LABEL%.}
   return 0
 }
 

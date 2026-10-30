@@ -1651,7 +1651,7 @@ ok - real herdr E2E: with two 'firstmate' workspaces, a worker spawned from insi
 ok - real herdr E2E: the duplicate-labeled sibling workspace is left entirely untouched and focus is preserved
 ok - real herdr E2E: with a duplicated home label, a projected worker still hangs off the launcher's exact workspace and the sibling stays untouched
 ok - real herdr E2E: named parents retain their own contiguous children and exact bindings across interleaved launches without changing focus
-ok - real herdr E2E: a parent label with a line break spawns flat in its exact workspace with no journal or projection
+ok - real herdr E2E: a parent label with an internal or trailing line break spawns flat in its exact workspace with no journal or projection
 ok - real herdr E2E: an ambiguous home label with no launcher identity refuses before any worker endpoint exists
 ok - real herdr E2E: a launcher pane that no longer exists refuses before any worker endpoint exists
 ok - real herdr E2E: a secondmate launching its own worker gets the same exact-workspace guarantee, and its same-labeled sibling is untouched

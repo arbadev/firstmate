@@ -1055,9 +1055,10 @@ test_launcher_identity_absent_when_herdr_env_alone_is_set() {
 }
 
 test_launcher_identity_resolves_the_exact_pane_tab_and_workspace() {
-  local dir log resp fb out label
-  for label in firstmate project-a; do
-    dir="$TMP_ROOT/launcher-ok-$label"; mkdir -p "$dir/responses"; log="$dir/log"; resp="$dir/responses"; : > "$log"
+  local dir log resp fb out label n=0
+  for label in firstmate project-a $'project-d\n'; do
+    n=$((n + 1))
+    dir="$TMP_ROOT/launcher-ok-$n"; mkdir -p "$dir/responses"; log="$dir/log"; resp="$dir/responses"; : > "$log"
     printf '{"sessions":[{"name":"fmtest","running":true,"socket_path":"/tmp/fm-herdr-unit/fmtest.sock"}]}\n' > "$resp/1.out"
     printf '{"result":{"pane":{"pane_id":"w7:p3","tab_id":"w7:t3","workspace_id":"w7"}}}\n' > "$resp/2.out"
     printf '{"result":{"tab":{"tab_id":"w7:t3","workspace_id":"w7"}}}\n' > "$resp/3.out"
@@ -1066,13 +1067,13 @@ test_launcher_identity_resolves_the_exact_pane_tab_and_workspace() {
     out=$( PATH="$fb:$PATH" FM_HERDR_LOG="$log" FM_HERDR_RESPONSES="$resp" \
       HERDR_ENV=1 HERDR_PANE_ID=w7:p3 HERDR_SESSION=fmtest HERDR_SOCKET_PATH=/tmp/fm-herdr-unit/fmtest.sock \
       bash -c '. "$0/bin/backends/herdr.sh"; fm_backend_herdr_launcher_identity fmtest || exit 1
-        printf "%s|%s|%s|%s" "$FM_BACKEND_HERDR_LAUNCHER_PANE_ID" "$FM_BACKEND_HERDR_LAUNCHER_TAB_ID" "$FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_ID" "$FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_LABEL"' "$ROOT" )
-    [ "$out" = "w7:p3|w7:t3|w7|$label" ] \
+        printf "%s|%s|%s|%s|" "$FM_BACKEND_HERDR_LAUNCHER_PANE_ID" "$FM_BACKEND_HERDR_LAUNCHER_TAB_ID" "$FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_ID" "$FM_BACKEND_HERDR_LAUNCHER_WORKSPACE_LABEL"' "$ROOT" )
+    [ "$out" = "w7:p3|w7:t3|w7|$label|" ] \
       || fail "launcher_identity should resolve the launcher's own pane, tab, workspace and label, got '$out'"
     assert_contains "$(cat "$log")" $'\x1f''pane'$'\x1f''get'$'\x1f''w7:p3' "launcher_identity did not read its own pane"
     assert_contains "$(cat "$log")" $'\x1f''tab'$'\x1f''get'$'\x1f''w7:t3' "launcher_identity did not cross-check the owning tab"
   done
-  pass "fm_backend_herdr_launcher_identity: exact workspace and label despite a same-labeled focused workspace sorting first"
+  pass "fm_backend_herdr_launcher_identity: exact workspace and raw label, trailing line break kept, despite a same-labeled focused workspace sorting first"
 }
 
 test_launcher_identity_refuses_a_pane_from_another_session_name() {
