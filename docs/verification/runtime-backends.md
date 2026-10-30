@@ -1639,7 +1639,8 @@ ok - real herdr E2E: teardown closes only the worker's own pane and leaves the l
 ```
 
 The full suite ran again on 2026-10-29 against Herdr 0.8.2 protocol 20.
-Every production spawn and teardown Herdr call went through the lab helper's guarded `run`, and the restart used only its `stop` and `provision` actions.
+Every production spawn and teardown Herdr CLI call went through the lab helper's guarded `run`, and the restart used only its `stop` and `provision` actions.
+The `workspace.move` request went directly to the lab session's own socket, as resolved through that routed `session list`.
 No case failed or was skipped:
 
 ```text

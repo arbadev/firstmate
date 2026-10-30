@@ -527,7 +527,7 @@ NAMED_A1_NEW_PANE=$(grep '^herdr_pane_id=' "$PRES_HOME/state/namedA1.meta" | cut
 spawn_from_launcher "$LAUNCH_NAMED_B" "$PRES_HOME" namedB1 "$PROJ" --mode no-mistakes --yolo off
 [ "$SPAWN_RC" -eq 0 ] || fail "a renamed parent must fall back flat, not fail the relaunch"$'\n'"$(cat "$SPAWN_ERR")"
 record_worktree "$PRES_HOME/state/namedB1.meta"
-assert_contains_local "$(cat "$SPAWN_ERR")" "spawning flat" "a renamed parent must refuse restart reclaim"
+assert_contains_local "$(cat "$SPAWN_ERR")" "ambiguous, renamed, foreign, or non-nested live shape" "a renamed parent must refuse restart reclaim through its live binding"
 [ "$(workspace_of_pane "$(grep '^herdr_pane_id=' "$PRES_HOME/state/namedB1.meta" | cut -d= -f2-)")" != "$NAMED_B1_WS" ] \
   || fail "a renamed parent's child was reclaimed anyway"
 [ "$(label_of_workspace "$NAMED_B1_WS")" = "$NAMED_B1_LABEL" ] || fail "a refused reclaim renamed or removed the old projection"
