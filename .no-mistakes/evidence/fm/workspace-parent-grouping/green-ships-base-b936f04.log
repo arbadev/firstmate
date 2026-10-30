@@ -1,0 +1,96 @@
+observed 2026-10-30T01:59:31Z
+herdr 0.8.2
+code root: $TMPDIR/fm-base-b936f04.1ClkMi (base b936f040)
+lab session: fm-lab-ws-parent-grp-14878-15762
+--- sidebar order: before any spawn ---
+  0: captain-other   [selected]
+  1: green
+  2: ships-ahoy
+  3: green
+spawn green1 rc=0
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/green-home/data/green1/launch-brief.md records no ship branch; defaulting to legacy branch fm/green1
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/green-home/data/green1/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+  stderr: warning: herdr presentation could not publish an exact restart binding; this task will use flat fallback after a restart
+--- sidebar order: after green1 ---
+  0: captain-other   [selected]
+  1: green
+  2: └ green1 · p:ipJCni31wNd0gJhTa-YZcQ
+  3: ships-ahoy
+  4: green
+spawn ships1 rc=0
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/ships-home/data/ships1/launch-brief.md records no ship branch; defaulting to legacy branch fm/ships1
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/ships-home/data/ships1/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+  stderr: warning: herdr presentation could not publish an exact restart binding; this task will use flat fallback after a restart
+--- sidebar order: after ships1 ---
+  0: captain-other   [selected]
+  1: green
+  2: └ green1 · p:ipJCni31wNd0gJhTa-YZcQ
+  3: ships-ahoy
+  4: └ ships1 · p:vpCeiEn7tL7oyvzl1kXNEw
+  5: green
+spawn green2 rc=0
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/green-home/data/green2/launch-brief.md records no ship branch; defaulting to legacy branch fm/green2
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/green-home/data/green2/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+  stderr: warning: herdr presentation ordering found an ambiguous workspace layout; leaving worker in Herdr's current order
+  stderr: warning: herdr presentation could not publish an exact restart binding; this task will use flat fallback after a restart
+spawn ships2 rc=0
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/ships-home/data/ships2/launch-brief.md records no ship branch; defaulting to legacy branch fm/ships2
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/ships-home/data/ships2/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+  stderr: warning: herdr presentation could not publish an exact restart binding; this task will use flat fallback after a restart
+--- sidebar order: after concurrent green2 + ships2 ---
+  0: captain-other   [selected]
+  1: green
+  2: └ green1 · p:ipJCni31wNd0gJhTa-YZcQ
+  3: ships-ahoy
+  4: └ ships1 · p:vpCeiEn7tL7oyvzl1kXNEw
+  5: └ ships2 · p:6y3pCW-MpHCOkGuupuhF-w
+  6: green
+  7: └ green2 · p:lL7n_ue1sUf7Rx9xS-aEkA
+spawn ships3 rc=0
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/ships-home/data/ships3/launch-brief.md records no ship branch; defaulting to legacy branch fm/ships3
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/ships-home/data/ships3/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+  stderr: warning: herdr presentation ordering found an ambiguous workspace layout; leaving worker in Herdr's current order
+  stderr: warning: herdr presentation could not publish an exact restart binding; this task will use flat fallback after a restart
+spawn green3 rc=0
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/green-home/data/green3/launch-brief.md records no ship branch; defaulting to legacy branch fm/green3
+  stderr: warning: $TMPDIR/fm-green-ships.Cxiqzb/green-home/data/green3/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+  stderr: warning: herdr presentation ordering found an ambiguous workspace layout; leaving worker in Herdr's current order
+  stderr: warning: herdr presentation could not publish an exact restart binding; this task will use flat fallback after a restart
+--- sidebar order: final ---
+  0: captain-other   [selected]
+  1: green
+  2: └ green1 · p:ipJCni31wNd0gJhTa-YZcQ
+  3: ships-ahoy
+  4: └ ships1 · p:vpCeiEn7tL7oyvzl1kXNEw
+  5: └ ships2 · p:6y3pCW-MpHCOkGuupuhF-w
+  6: green
+  7: └ green2 · p:lL7n_ue1sUf7Rx9xS-aEkA
+  8: └ ships3 · p:i_VD67mOL4FC8pP33VG7Xw
+  9: └ green3 · p:EVKuaMt5qaadrK9BDpCgVw
+--- assertions ---
+journal green1: version=1 parent_workspace_id= parent_label=
+ok - green1 spawned successfully
+not ok - green1 published an exact v2 binding to its own parent (green) and live label
+journal green2: version=1 parent_workspace_id= parent_label=
+ok - green2 spawned successfully
+not ok - green2 published an exact v2 binding to its own parent (green) and live label
+journal green3: version=1 parent_workspace_id= parent_label=
+ok - green3 spawned successfully
+not ok - green3 published an exact v2 binding to its own parent (green) and live label
+journal ships1: version=1 parent_workspace_id= parent_label=
+ok - ships1 spawned successfully
+not ok - ships1 published an exact v2 binding to its own parent (ships-ahoy) and live label
+journal ships2: version=1 parent_workspace_id= parent_label=
+ok - ships2 spawned successfully
+not ok - ships2 published an exact v2 binding to its own parent (ships-ahoy) and live label
+journal ships3: version=1 parent_workspace_id= parent_label=
+ok - ships3 spawned successfully
+not ok - ships3 published an exact v2 binding to its own parent (ships-ahoy) and live label
+not ok - green's three children form one contiguous block immediately under green
+not ok - ships-ahoy's three children form one contiguous block immediately under ships-ahoy
+ok - no ships-ahoy child sits between green and ships-ahoy
+ok - the duplicate-labeled 'green' decoy workspace gained no tabs and kept its label
+ok - the captain's selected workspace never changed
+result: 8 failing assertion(s)
+ok - lab session torn down; default fleet session tripwire unchanged
+exit=1
